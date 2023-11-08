@@ -2,7 +2,17 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="card">
+    <div class="card-header">
+        <h1 class="display-3 fw-bold text-center">The List MVC Pro</h1>
+        <h2 class="display-5 text-center">Your Pro Solution for Staying Organized</h2>
+    </div>
+    <div class="card-body">
+        <p class="text-center">Try out out new software to help you keep your life organized and balanced. Keep your tasks secure with our Authenication system provided by Microsoft, and no that your data will always be there through persistence provided by PostgreSQL.</p>
+        <p class="text-center fs-3 fw-bold">Get started today by creating an account and logging in!!! </p>
+        <div class="col-12 btn text-center">
+            <a class="btn btn-lg btn-outline-primary rounded-pill px-5" style="height:min-content" asp-controller="ToDoItems" asp-action="Index">Get Started!</a>
+        </div>
+    </div>
+
 </div>

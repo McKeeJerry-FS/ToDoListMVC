@@ -1,3 +1,21 @@
+:root {
+    --jm-primaryColor: #0869b8;
+    --jm-primaryColorDark: #002a4e;
+    --jm-primaryColorLight: #edf5fc;
+    --jm-secondaryColor: var(--jm-cyan-800);
+    --jm-secondaryColorLight: #FFF8EC;
+    --jm-backgroundColor: var(--jm-cyan-200);
+    --jm-dark-color: #131313;
+    --jm-light-gray: #d9d9d9;
+    --jm-light-color: #eeeeee;
+    --jm-title-font: 'Fira Sans', sans-serif;
+    --jm-body-font: 'Roboto', sans-serif;
+}
+
+html, body {
+    height: 100%;
+}
+
 html {
   font-size: 14px;
 }
@@ -18,5 +36,41 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-image: url(/img/colorful-bg-img.jpg);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
 }
+
+.container {
+    background-color: var(--jm-cyan-800);
+    padding: 3rem;
+    margin-top: 8rem;
+}
+
+.card {
+    background-color: var(--jm-gray-300);
+}
+
+nav {
+    background-color: var(--jm-secondaryColor)
+}
+
+.footer {
+    flex-shrink: 0;
+    background-color: var(--jm-secondaryColor);
+}
+
+.socialicons {
+    color: var(--jm-primaryColorLight);
+    opacity: .9;
+    font-size: 2rem;
+}
+
+    .socialicons:hover {
+        color: var(--jm-primaryColor);
+        opacity: 1;
+        cursor: pointer;
+    }
