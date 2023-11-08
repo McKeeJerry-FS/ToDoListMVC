@@ -45,7 +45,7 @@ body {
 }
 
 .container {
-    background-color: var(--jm-cyan-800);
+    background-color: var(--jm-cyan-200);
     padding: 3rem;
     margin-top: 8rem;
 }
