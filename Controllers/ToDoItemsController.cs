@@ -111,12 +111,13 @@ namespace ToDoListMVC.Controllers
                 return NotFound();
             }
 
-            var toDoItem = await _context.ToDoItems.FindAsync(id);
+            string? userId = _userManager?.GetUserId(User);
+            var toDoItem = await _context.ToDoItems.FirstOrDefaultAsync(t => t.Id == id && t.AppUserId == userId);
             if (toDoItem == null)
             {
                 return NotFound();
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", toDoItem.AppUserId);
+            ViewData["AppUserId"] = new SelectList(_context.ToDoItems.Where(t => t.AppUserId == userId), "Id", "Name");
             return View(toDoItem);
         }
 
@@ -131,6 +132,8 @@ namespace ToDoListMVC.Controllers
             {
                 return NotFound();
             }
+
+            string? userId = _userManager.GetUserId(User);
 
             if (ModelState.IsValid)
             {
@@ -152,7 +155,7 @@ namespace ToDoListMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.Users, "Id", "Id", toDoItem.AppUserId);
+            ViewData["AppUserId"] = new SelectList(_context.ToDoItems.Where(t => t.AppUserId == userId), "Id", "Name");
             return View(toDoItem);
         }
 
