@@ -29,8 +29,14 @@ namespace ToDoListMVC.Controllers
         // GET: ToDoItems
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.ToDoItems.Include(t => t.AppUser);
-            return View(await applicationDbContext.ToListAsync());
+            string? userId = _userManager?.GetUserId(User);
+            List<ToDoItem> toDoItems = new();
+            toDoItems = await _context.ToDoItems.Include(t => t.Accessories)
+                                                .Where(t => t.AppUserId == userId)
+                                                .ToListAsync();                
+
+            ViewData["AccessoriesList"] = new SelectList(_context.Accessories.Where(t => t.AppUserId == userId), "Id", "Name");
+            return View(toDoItems);
         }
 
         #endregion
@@ -65,7 +71,7 @@ namespace ToDoListMVC.Controllers
         {
             string? userId = _userManager?.GetUserId(User);
 
-            ViewData["AppUserId"] = new SelectList(_context.ToDoItems.Where(t => t.AppUserId == userId), "Id", "Name");
+            ViewData["AccessoriesList"] = new SelectList(_context.Accessories.Where(t => t.AppUserId == userId), "Id", "Name");
             return View();
         }
 
@@ -78,7 +84,7 @@ namespace ToDoListMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,AppUserId,DateCreated,Completed")] ToDoItem toDoItem)
+        public async Task<IActionResult> Create([Bind("Id,Name,DateCreated,Completed")] ToDoItem toDoItem, IEnumerable<int> selected)
         {
             ModelState.Remove("AppUserId");
             string? userId = _userManager.GetUserId(User);
@@ -91,14 +97,20 @@ namespace ToDoListMVC.Controllers
                 _context.Add(toDoItem);
                 await _context.SaveChangesAsync();
 
-                //foreach (var item in collection)
-                //{
-
-                //}
+                foreach (int item in selected)
+                {
+                    Accessory? accessory = await _context.Accessories.FindAsync(item);
+                    if(toDoItem != null && accessory != null)
+                    {
+                        toDoItem.Accessories.Add(accessory);
+                    }
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
 
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.ToDoItems.Where(t => t.AppUserId == userId), "Id", "Name");
+            ViewData["AccessoriesList"] = new SelectList(_context.Accessories.Where(t => t.AppUserId == userId), "Id", "Name");
             return View(toDoItem);
         }
 
@@ -117,7 +129,8 @@ namespace ToDoListMVC.Controllers
             {
                 return NotFound();
             }
-            ViewData["AppUserId"] = new SelectList(_context.ToDoItems.Where(t => t.AppUserId == userId), "Id", "Name");
+            IEnumerable<int> currentAccessories = toDoItem.Accessories.Select(t => t.Id);
+            ViewData["AccessoriesList"] = new MultiSelectList(_context.Accessories.Where(t => t.AppUserId == userId), "Id", "Name", currentAccessories);
             return View(toDoItem);
         }
 
@@ -126,7 +139,7 @@ namespace ToDoListMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,AppUserId,DateCreated,Completed")] ToDoItem toDoItem)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,AppUserId,DateCreated,Completed")] ToDoItem toDoItem, IEnumerable<int> selected)
         {
             if (id != toDoItem.Id)
             {
@@ -141,6 +154,25 @@ namespace ToDoListMVC.Controllers
                 {
                     _context.Update(toDoItem);
                     await _context.SaveChangesAsync();
+
+                    // Remove current accessories
+                    ToDoItem? updatedToDoItem = await _context.ToDoItems.Include(t => t.Accessories)
+                                                                        .FirstOrDefaultAsync(t => t.Id == id && t.AppUserId == userId);
+
+                    updatedToDoItem?.Accessories.Clear();
+                    _context.Update(updatedToDoItem);
+                    await _context.SaveChangesAsync();
+
+                    foreach(int item in selected)
+                    {
+                        Accessory? accessory = await _context.Accessories.FindAsync(item);
+                        if(toDoItem != null && accessory != null)
+                        {
+                            toDoItem.Accessories.Add(accessory);
+                        }
+                    }
+                    await _context.SaveChangesAsync();
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -155,7 +187,7 @@ namespace ToDoListMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AppUserId"] = new SelectList(_context.ToDoItems.Where(t => t.AppUserId == userId), "Id", "Name");
+            ViewData["AccessoriesList"] = new MultiSelectList(_context.Accessories.Where(t => t.AppUserId == userId), "Id", "Name");
             return View(toDoItem);
         }
 

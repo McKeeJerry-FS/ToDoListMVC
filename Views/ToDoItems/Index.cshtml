@@ -21,10 +21,10 @@
             <th>
                 @Html.DisplayNameFor(model => model.Completed)
             </th>
-            <th>
+            @* <th>
                 @Html.DisplayNameFor(model => model.AppUser)
-            </th>
-            <th></th>
+            </th> *@
+            <th>@Html.DisplayNameFor(model => model.Accessories)</th>
         </tr>
     </thead>
     <tbody>
@@ -39,8 +39,14 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Completed)
             </td>
-            <td>
+            @* <td>
                 @Html.DisplayFor(modelItem => item.AppUser.Id)
+            </td> *@
+            <td>
+                    @foreach(Accessory accessory in item.Accessories)
+                    {
+                        <span>@accessory.Name, </span>
+                    }
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
