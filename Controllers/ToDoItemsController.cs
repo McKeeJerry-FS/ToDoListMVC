@@ -15,6 +15,7 @@ namespace ToDoListMVC.Controllers
     [Authorize]
     public class ToDoItemsController : Controller
     {
+        #region Properties
         private readonly ApplicationDbContext _context;
         private readonly UserManager<AppUser> _userManager;
 
@@ -25,7 +26,10 @@ namespace ToDoListMVC.Controllers
             _userManager = userManager;
         }
 
-        #region GET: ToDoItems
+        #endregion
+
+
+        #region GET: ToDoItems/Index
         // GET: ToDoItems
         public async Task<IActionResult> Index()
         {
@@ -41,7 +45,23 @@ namespace ToDoListMVC.Controllers
 
         #endregion
 
+       
+        #region GET: ToDoItems/CompletedIndex
+        public async Task<IActionResult> CompletedIndex()
+        {
+            string? userId = _userManager?.GetUserId(User);
+            List<ToDoItem> toDoItems = new();
+            toDoItems = await _context.ToDoItems.Include(t => t.Accessories)
+                                                .Where(t => t.AppUserId == userId)
+                                                .ToListAsync();
 
+            ViewData["AccessoriesList"] = new SelectList(_context.Accessories.Where(t => t.AppUserId == userId), "Id", "Name");
+            return View(toDoItems);
+        }
+
+        #endregion
+
+        
         #region GET: ToDoItems/Details
         // GET: ToDoItems/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -115,6 +135,9 @@ namespace ToDoListMVC.Controllers
         }
 
         #endregion
+
+
+        #region GET: ToDoItems/Edit
         // GET: ToDoItems/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -134,6 +157,10 @@ namespace ToDoListMVC.Controllers
             return View(toDoItem);
         }
 
+        #endregion
+
+
+        #region POST: ToDoItems/Edit
         // POST: ToDoItems/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -163,10 +190,10 @@ namespace ToDoListMVC.Controllers
                     _context.Update(updatedToDoItem);
                     await _context.SaveChangesAsync();
 
-                    foreach(int item in selected)
+                    foreach (int item in selected)
                     {
                         Accessory? accessory = await _context.Accessories.FindAsync(item);
-                        if(toDoItem != null && accessory != null)
+                        if (toDoItem != null && accessory != null)
                         {
                             toDoItem.Accessories.Add(accessory);
                         }
@@ -191,6 +218,10 @@ namespace ToDoListMVC.Controllers
             return View(toDoItem);
         }
 
+        #endregion
+
+
+        #region GET: ToDoItems/Delete
         // GET: ToDoItems/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
@@ -210,6 +241,10 @@ namespace ToDoListMVC.Controllers
             return View(toDoItem);
         }
 
+        #endregion
+
+
+        #region POST: ToDoItems/Delete
         // POST: ToDoItems/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -224,14 +259,19 @@ namespace ToDoListMVC.Controllers
             {
                 _context.ToDoItems.Remove(toDoItem);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
+        #endregion
+
+
+        #region ToDoItemExists
         private bool ToDoItemExists(int id)
         {
-          return (_context.ToDoItems?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+            return (_context.ToDoItems?.Any(e => e.Id == id)).GetValueOrDefault();
+        } 
+        #endregion
     }
 }

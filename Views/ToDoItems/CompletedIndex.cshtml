@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<ToDoListMVC.Models.ToDoItem>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Completed Index";
 }
 <div class="card bg-light p-2">
 
@@ -21,14 +21,14 @@
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Completed)
-                </th>               
+                </th>
                 <th>@Html.DisplayNameFor(model => model.Accessories)</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
-                @if (item.Completed == false)
+                @if (item.Completed == true)
                 {
 
                     <tr>
@@ -38,7 +38,7 @@
                         <td>
                             @Html.DisplayFor(modelItem => item.DateCreated)
                         </td>
-                        <td>
+                        <td class="text-black">
                             @Html.DisplayFor(modelItem => item.Completed)
                         </td>
                         <td>
